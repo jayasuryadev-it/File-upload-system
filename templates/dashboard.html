@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Welcome, {{ current_user.name }}</h2>
+
+<div class="card shadow mb-4">
+
+    <div class="card-header bg-primary text-white">
+        Upload Files
+    </div>
+
+    <div class="card-body">
+
+        <form action="{{ url_for('main.upload') }}" method="POST" enctype="multipart/form-data">
+
+            <div class="mb-3">
+                <label class="form-label">File 1</label>
+                <input
+                    type="file"
+                    name="file1"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">File 2</label>
+                <input
+                    type="file"
+                    name="file2"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                📤 Upload Files
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-header bg-dark text-white">
+        Uploaded Files
+    </div>
+
+    <div class="card-body">
+
+        {% if uploaded_files %}
+
+        <table class="table table-bordered table-hover">
+
+            <thead>
+
+                <tr>
+                    <th>Filename</th>
+                    <th>Type</th>
+                    <th>Uploaded On</th>
+                    <th>Download</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for file in uploaded_files %}
+
+                <tr>
+
+                    <td>{{ file.filename }}</td>
+
+                    <td>{{ file.filetype|upper }}</td>
+
+                    <td>{{ file.upload_time }}</td>
+
+                    <td class="text-center">
+                        <a
+                            href="{{ url_for('main.download', filename=file.filename) }}"
+                            class="btn btn-primary btn-sm"
+                        >
+                            Download
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="alert alert-warning">
+            No files uploaded yet.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

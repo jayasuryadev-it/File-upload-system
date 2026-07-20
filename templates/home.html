@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+
+<div class="text-center mt-5">
+
+    <h1>File Upload System</h1>
+
+    <p class="lead">
+        Secure File Upload and Download using Flask & MySQL
+    </p>
+
+    <div class="mt-4">
+
+        <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg">
+            Login
+        </a>
+
+        <a href="{{ url_for('main.signup') }}" class="btn btn-success btn-lg">
+            Sign Up
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
