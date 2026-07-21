@@ -108,6 +108,8 @@ def upload():
 
     files = [file1, file2]
 
+    os.makedirs(current_app.config["UPLOAD_FOLDER"], exist_ok=True)
+
     for file in files:
 
         if file.filename == "":
