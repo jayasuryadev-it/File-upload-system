@@ -14,6 +14,7 @@ from flask_login import (
     logout_user
 )
 import os
+import uuid
 
 from werkzeug.utils import secure_filename
 
@@ -21,12 +22,14 @@ from models import db, User, UploadedFile
 
 main = Blueprint("main", __name__)
 
+
 def allowed_file(filename):
     return (
         "." in filename and
         filename.rsplit(".", 1)[1].lower() in
         {"pdf", "png", "jpg", "jpeg"}
     )
+
 
 @main.route("/")
 def home():
@@ -83,6 +86,7 @@ def login():
 
     return render_template("login.html")
 
+
 @main.route("/dashboard")
 @login_required
 def dashboard():
@@ -96,6 +100,7 @@ def dashboard():
         uploaded_files=uploaded_files
     )
 
+
 @main.route("/upload", methods=["POST"])
 @login_required
 def upload():
@@ -108,7 +113,18 @@ def upload():
 
     files = [file1, file2]
 
+    # Create uploads folder
     os.makedirs(current_app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+    # Create user-specific folder
+    folder_name = f"{current_user.name}_{current_user.id}"
+
+    user_folder = os.path.join(
+        current_app.config["UPLOAD_FOLDER"],
+        folder_name
+    )
+
+    os.makedirs(user_folder, exist_ok=True)
 
     for file in files:
 
@@ -122,10 +138,12 @@ def upload():
 
         extension = filename.rsplit(".", 1)[1].lower()
 
-        new_filename = f"{current_user.name}_{filename}"
+        # Prevent duplicate filenames
+        unique_id = uuid.uuid4().hex[:8]
+        new_filename = f"{unique_id}_{filename}"
 
         save_path = os.path.join(
-            current_app.config["UPLOAD_FOLDER"],
+            user_folder,
             new_filename
         )
 
@@ -143,15 +161,24 @@ def upload():
 
     return "Files Uploaded Successfully"
 
+
 @main.route("/download/<filename>")
 @login_required
 def download(filename):
 
-    return send_from_directory(
+    folder_name = f"{current_user.name}_{current_user.id}"
+
+    user_folder = os.path.join(
         current_app.config["UPLOAD_FOLDER"],
+        folder_name
+    )
+
+    return send_from_directory(
+        user_folder,
         filename,
         as_attachment=True
     )
+
 
 @main.route("/logout")
 @login_required
